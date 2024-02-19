@@ -1,3 +1,4 @@
+"use strict";
 // Методы, которые могут пригодиться:
 // starWars.searchCharacters(query),
 // starWars.searchPlanets(query),
@@ -5,37 +6,23 @@
 // starWars.getCharactersById(id),
 // starWars.getPlanetsById(id),
 // starWars.getSpeciesById(id)
-
-const searchButton = document.getElementById("byQueryBtn") as HTMLButtonElement;
-const searchButtonId = document.getElementById("byIdBtn") as HTMLButtonElement;
-const resultContainer = document.getElementById(
-  "result-container"
-) as HTMLElement;
-const spinner = document.querySelector(".spinner") as HTMLElement;
-const msgHeader = document.querySelector(".message-header") as HTMLElement;
-const msgBody = document.querySelector(".message-body") as HTMLElement;
-const resourceSelect = document.getElementById(
-  "selection"
-) as HTMLSelectElement;
-const resourceSelectId = document.getElementById(
-  "selectionId"
-) as HTMLSelectElement;
-
+const searchButton = document.getElementById("byQueryBtn");
+const searchButtonId = document.getElementById("byIdBtn");
+const resultContainer = document.getElementById("result-container");
+const spinner = document.querySelector(".spinner");
+const msgHeader = document.querySelector(".message-header");
+const msgBody = document.querySelector(".message-body");
+const resourceSelect = document.getElementById("selection");
+const resourceSelectId = document.getElementById("selectionId");
 searchButton.addEventListener("click", searchCharacters);
-
 async function searchCharacters() {
-  const input = (
-    document.querySelector(".inputByQuery") as HTMLInputElement
-  ).value.trim();
+  const input = document.querySelector(".inputByQuery").value.trim();
   const selectedResource = resourceSelect.value;
-
   spinner.style.visibility = "visible";
-
   msgHeader.textContent = "";
   msgBody.textContent = "";
   resultContainer.style.visibility = "hidden";
-
-  let searchMethod: (input: string) => Promise<IData>;
+  let searchMethod;
   switch (selectedResource) {
     case "people":
       searchMethod = starWars.searchCharacters;
@@ -50,37 +37,29 @@ async function searchCharacters() {
       console.error("Invalid resource selected");
       return;
   }
-
   try {
     const result = await searchMethod(input);
-
     spinner.style.visibility = "hidden";
-
     resultContainer.style.visibility = "visible";
     const data = result.results[0];
-
     if ("homeworld" in data) {
       if (data && data.homeworld) {
         const homeworldId = data.homeworld.split("/").slice(-2, -1)[0];
         let homeworldData, homeworldName;
-
         if (selectedResource === "people") {
           homeworldData = await starWars.getPlanetsById(homeworldId);
         } else if (selectedResource === "species") {
           homeworldData = await starWars.getSpeciesById(homeworldId);
         }
-
         if (homeworldData) {
           homeworldName = homeworldData.name;
           data.homeworld = homeworldName;
         }
       }
     }
-
     if (data && data.name) {
       msgHeader.textContent = data.name;
     }
-
     for (let key in data) {
       const value = document.createElement("p");
       if (key === "homeworld" && selectedResource === "species") {
@@ -97,22 +76,15 @@ async function searchCharacters() {
     spinner.style.visibility = "hidden";
   }
 }
-
 searchButtonId.addEventListener("click", searchById);
-
 async function searchById() {
-  const inputById = (
-    document.getElementById("input") as HTMLInputElement
-  ).value.trim();
+  const inputById = document.getElementById("input").value.trim();
   const selectedResource = resourceSelectId.value;
-
   spinner.style.visibility = "visible";
-
   msgHeader.textContent = "";
   msgBody.textContent = "";
   resultContainer.style.visibility = "hidden";
-
-  let getByIdMethod: (id: string) => Promise<data>;
+  let getByIdMethod;
   switch (selectedResource) {
     case "people":
       getByIdMethod = starWars.getCharactersById;
@@ -127,19 +99,15 @@ async function searchById() {
       console.error("Invalid resource selected");
       return;
   }
-
   try {
     const result = await getByIdMethod(inputById);
-
     spinner.style.visibility = "hidden";
-
     resultContainer.style.visibility = "visible";
     if ("title" in result) {
     }
     if (result && result.name) {
       msgHeader.textContent = result.name;
     }
-
     for (let key in result) {
       const value = document.createElement("p");
       if (key === "homeworld" && selectedResource === "species") {
